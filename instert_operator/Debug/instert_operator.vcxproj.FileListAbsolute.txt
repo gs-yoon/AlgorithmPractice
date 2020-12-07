@@ -1,0 +1,2 @@
+C:\Users\silja\source\repos\instert_operator\Debug\instert_operator.exe
+C:\Users\silja\source\repos\instert_operator\Debug\instert_operator.pdb
