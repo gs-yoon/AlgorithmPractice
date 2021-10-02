@@ -18,7 +18,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="01_EscapingBead.cpp">
+    <ClCompile Include="01_EscapingBead_dfs.cpp">
+      <Filter>소스 파일\01_10</Filter>
+    </ClCompile>
+    <ClCompile Include="01_EscapingBead_bfs.cpp">
+      <Filter>소스 파일\01_10</Filter>
+    </ClCompile>
+    <ClCompile Include="02_2048.cpp">
       <Filter>소스 파일\01_10</Filter>
     </ClCompile>
   </ItemGroup>
