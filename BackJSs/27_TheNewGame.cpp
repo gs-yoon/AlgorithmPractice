@@ -25,6 +25,7 @@ struct Horse
 
 int reverse_dir(int dir);
 vector<Horse>::iterator move(int nx, int ny, int cur_x, int cur_y, vector<Horse>::iterator itr);
+void move_blue(int nx, int ny, int cur_x, int cur_y, vector<Horse>::iterator first_horse_itr);
 void print_vec();
 
 int dx[] = { 1,-1,0,0 };
@@ -74,7 +75,7 @@ int main()
 			trial = -1;
 			break;
 		}
-		print_vec();
+		//print_vec();
 		trial++;
 		for (int i = 0; i < horse_itr_vec.size(); i++)
 		{
@@ -90,25 +91,7 @@ int main()
 				first_horse_itr->dir = reverse_dir(first_horse_itr->dir);
 				nx = cur_x + dx[first_horse_itr->dir];
 				ny = cur_y + dy[first_horse_itr->dir];
-				if ( !(nx < 0 || nx >= N || ny < 0 || ny >= N) )
-				{
-					if (g_map[nx][ny] == WHITE)
-					{
-						for (vector<Horse>::iterator itr = first_horse_itr; itr != horse_map[cur_x][cur_y].end(); )
-						{
-							itr = move(nx, ny, cur_x, cur_y, itr);
-						}
-					}
-					else if (g_map[nx][ny] == RED)
-					{
-						for (vector<Horse>::iterator itr = horse_map[cur_x][cur_y].end() - 1; itr != first_horse_itr; )
-						{
-							itr = move(nx, ny, cur_x, cur_y, itr);
-							itr--;
-						}
-						move(nx, ny, cur_x, cur_y, first_horse_itr);
-					}
-				}
+				move_blue(nx, ny, cur_x, cur_y, first_horse_itr);
 			}
 			else if (g_map[nx][ny] == WHITE)
 			{
@@ -131,30 +114,12 @@ int main()
 				first_horse_itr->dir = reverse_dir(first_horse_itr->dir);
 				nx = cur_x + dx[first_horse_itr->dir];
 				ny = cur_y + dy[first_horse_itr->dir];
-				if ( !(nx < 0 || nx >= N || ny < 0 || ny >= N))
-				{
-					if (g_map[nx][ny] == WHITE)
-					{
-						for (vector<Horse>::iterator itr = first_horse_itr; itr != horse_map[cur_x][cur_y].end(); )
-						{
-							itr = move(nx, ny, cur_x, cur_y, itr);
-						}
-					}
-					else if (g_map[nx][ny] == RED)
-					{
-						for (vector<Horse>::iterator itr = horse_map[cur_x][cur_y].end() - 1; itr != first_horse_itr; )
-						{
-							itr = move(nx, ny, cur_x, cur_y, itr);
-							itr--;
-						}
-						move(nx, ny, cur_x, cur_y, first_horse_itr);
-					}
-				}
+				move_blue(nx, ny, cur_x, cur_y, first_horse_itr);
 			}
 			if (horse_map[nx][ny].size() >= 4)
 			{
 				keep_going = false;
-				print_vec();
+				//print_vec();
 				break;
 			}
 		}
@@ -175,7 +140,32 @@ vector<Horse>::iterator move(int nx, int ny,int cur_x ,int cur_y, vector<Horse>:
 
 	// itr ªË¡¶
 	itr = horse_map[cur_x][cur_y].erase(itr);
+	print_vec();
 	return itr;
+}
+
+void move_blue(int nx, int ny, int cur_x, int cur_y, vector<Horse>::iterator first_horse_itr)
+{
+
+	if (!(nx < 0 || nx >= N || ny < 0 || ny >= N))
+	{
+		if (g_map[nx][ny] == WHITE)
+		{
+			for (vector<Horse>::iterator itr = first_horse_itr; itr != horse_map[cur_x][cur_y].end(); )
+			{
+				itr = move(nx, ny, cur_x, cur_y, itr);
+			}
+		}
+		else if (g_map[nx][ny] == RED)
+		{
+			for (vector<Horse>::iterator itr = horse_map[cur_x][cur_y].end() - 1; itr != first_horse_itr; )
+			{
+				itr = move(nx, ny, cur_x, cur_y, itr);
+				itr--;
+			}
+			move(nx, ny, cur_x, cur_y, first_horse_itr);
+		}
+	}
 }
 
 int reverse_dir(int dir)
@@ -191,6 +181,11 @@ int reverse_dir(int dir)
 
 	else if (dir == DOWN)
 		return UP;
+	else
+	{
+		cout << "reveser_dir error";
+		return -1;
+	}
 }
 
 void print_vec()
@@ -198,7 +193,15 @@ void print_vec()
 	cout << endl;
 	for (int i = 0; i < horse_itr_vec.size(); i++)
 	{
-		cout << "id = " << horse_itr_vec.at(i)->id << " x = " << horse_itr_vec.at(i)->x << " y = " << horse_itr_vec.at(i)->y << " dir = "<< horse_itr_vec.at(i)->dir <<endl;
+		cout << "id = " << horse_itr_vec.at(i)->id << " x = " << horse_itr_vec.at(i)->x << " y = " << horse_itr_vec.at(i)->y << " dir = ";
+		if( horse_itr_vec.at(i)->dir == UP)
+			cout << "UP" << endl;
+		if (horse_itr_vec.at(i)->dir == DOWN)
+			cout << "DOWN" << endl;
+		if (horse_itr_vec.at(i)->dir == RIGHT)
+			cout << "RIGHT" << endl;
+		if (horse_itr_vec.at(i)->dir == LEFT)
+			cout << "LEFT" << endl;
 	}
 	cout << endl;
 	for (int yi =0 ; yi < N ;yi++)
@@ -206,18 +209,28 @@ void print_vec()
 		for (int xi = 0; xi < N; xi++)
 		{
 			int s = 1;
-			for (int i = 0; i < horse_itr_vec.size(); i++)
+			int cnt = 0;
+			for (int i = 0; i < horse_map[xi][yi].size(); i++)
 			{
-				if (xi == horse_itr_vec.at(i)->x && yi == horse_itr_vec.at(i)->y)
-				{
-					cout << horse_itr_vec.at(i)->id;
-					s = 0;
-				}
+				cout << horse_map[xi][yi].at(i).id;
+				s = 0;
+				cnt++;
 			}
 			if (s == 1)
-				cout << "*" << "  ";
+			{
+				if (g_map[xi][yi] == RED)
+					cout << "R";
+				if (g_map[xi][yi] == BLUE)
+					cout << "B";
+				if (g_map[xi][yi] == WHITE)
+					cout << "W";
+				cout << "    ";
+			}
 			else
-				cout << "  ";
+			{
+				for (int i = 0; i < 5 - cnt; i++)
+					cout << " ";
+			}
 		}
 		cout << endl;
 	}
