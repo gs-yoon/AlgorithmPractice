@@ -121,4 +121,9 @@
       <Filter>소스 파일\21_30</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="28_.Stencil.cpp">
+      <Filter>소스 파일\21_30</Filter>
+    </None>
+  </ItemGroup>
 </Project>
