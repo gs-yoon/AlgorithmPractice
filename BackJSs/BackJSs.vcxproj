@@ -234,9 +234,12 @@
     <ClCompile Include="27_TheNewGame.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="38_SharkMiddleSchool.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="28_.Stencil.cpp" />
+    <None Include="28_.Stencil.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
