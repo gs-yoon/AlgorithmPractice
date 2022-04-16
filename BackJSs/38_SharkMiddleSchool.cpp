@@ -10,6 +10,7 @@ using namespace std;
 #define EMPTY -2
 // NORMAL > 0
 #define DIRMAX 4
+#define DEBUG 0
 
 struct Group
 {
@@ -17,6 +18,7 @@ struct Group
 	int std_x = 99;
 	int std_y = 99;
 	int num_of_blocks = 0;
+	int num_of_rainbows = 0;
 };
 
 enum DIR
@@ -34,7 +36,7 @@ void rotate(int map[20][20]);
 void copy_map(int dst[20][20], int src[20][20]);
 void erase__(int x, int y, int group_id, int map[20][20], int group_map[20][20], bool visited[20][20], int* cnt);
 bool erase(Group group_info, int map[20][20], int group_map[20][20]);
-void print_map(int map[20][20]);
+void print_map(int map[20][20], const char* msg);
 
 int dx[] = { 0, -1, 0, 1 };
 int dy[] = { -1, 0, 1, 0 };
@@ -76,9 +78,7 @@ int main()
 		int max_num = 0;
 		int max_idx =-1;
 
-		cout << "new stage starat ! \n";
-		printf("map \n");
-		print_map(map);
+		print_map(map, "map");
 		//grouping
 		for(int ny =0; ny < N ; ny ++)
 		{
@@ -97,6 +97,29 @@ int main()
 						{
 							max_num = group_info.num_of_blocks;
 							max_idx = group_vec.size() - 1;
+						}
+						else if (group_info.num_of_blocks == max_num)
+						{
+							Group prev_max_group_info = group_vec[max_idx];
+
+							if (group_info.num_of_rainbows > prev_max_group_info.num_of_rainbows)
+							{
+								max_idx = group_vec.size() - 1;
+							}
+							else if (group_info.num_of_rainbows == prev_max_group_info.num_of_rainbows)
+							{
+								if (group_info.std_y > prev_max_group_info.std_y)
+								{
+									max_idx = group_vec.size() - 1;
+								}
+								else if (group_info.std_y == prev_max_group_info.std_y)
+								{
+									if (group_info.std_x > prev_max_group_info.std_x)
+									{
+										max_idx = group_vec.size() - 1;
+									}
+								}
+							}
 						}
 						ngid++;
 					}
@@ -121,38 +144,33 @@ int main()
 			int std_x = max_group_info.std_x;
 			int std_y = max_group_info.std_y;
 			grouping(std_x, std_y, map[std_x][std_y], &temp, map, visited, max_group_map);
-			printf("maximum group_map stdx = %d, stdy = %d \n",std_x,std_y);
-			print_map(max_group_map);
+			print_map(max_group_map, "maximum group_map" );
 
 			// delete max group :
 			bool status = erase(max_group_info, map, max_group_map);
 			if (status == true)
 			{
 				g_score += max_num * max_num;
-				cout << "max num is " << max_num << endl;
 			}
 			else
 				printf("erase fail\n");
 
+			print_map(map, "after erase");
 			// gravitiy
 			gravity(map);
-			printf("after gravity\n");
-			print_map(map);
+			print_map(map, "after gravity");
 			// rotate 90
-			printf("after rotate\n");
 			rotate(map);
-			print_map(map);
+			print_map(map, "after rotate");
 			// apply gravity
 			gravity(map);
-			printf("after gravity\n");
-			print_map(map);
+			print_map(map, "after gravity");
 		}
 		// if no group, playing is false
 		else
 		{
 			playing = false;
 		}
-		cout << "score = " << g_score << endl;
 	}
 	cout << g_score <<endl;
 }
@@ -199,22 +217,22 @@ void erase__(int x, int y, int group_id, int map[20][20], int group_map[20][20] 
 void copy_map(int dst[20][20], int src[20][20])
 {
 	for (int i = 0; i < N; i++)
-		memcpy(dst[i], src[i], 20);
-		//copy(src[i], src[i]+20, dst[i]);
+		//memcpy(dst[i], src[i], 20);
+		copy(src[i], src[i]+20, dst[i]);
 }
 
 void rotate(int map[20][20])
 {
 	int tmap[20][20];
-	int m = (float)N / 2.0;
+	float m = (float)(N-1) / 2.0;
 	for (int y = 0; y < N; y++)
 	{
 		for (int x = 0; x < N; x++)
 		{
 			float mx = (float)x - m;
 			float my = (float)y - m;
-			int rx = (0 * mx - 1 * my) + m;
-			int ry = (1 * mx + 0 * my) + m;
+			int rx = ( 0 * mx + 1 * my) + m;
+			int ry = (-1 * mx + 0 * my) + m;
 			if (0 <= rx && rx < N && 0 <= ry && ry < N)
 				tmap[rx][ry] = map[x][y];
 			else
@@ -242,23 +260,27 @@ void gravity__(int x , int y , int map[20][20])
 {
 	int ny = y;
 	int nx = x;
+	int ty = y;
 	bool condition = true;
+	bool moved = false;
 	while (condition)
 	{
-		ny++;
-		if (ny < N && map[nx][ny] == EMPTY)
+		if (ny+1 < N && map[nx][ny+1] == EMPTY)
 		{
+			ny++;
 			condition = true;
+			moved = true;
 		}
 		else
 		{
-			ny--;
 			condition = false;
 		}
 	}
-	map[nx][ny] = map[x][y];
-	map[x][y] = EMPTY;
-	printf("app grav %d %d %d %d\n",nx,ny,x,y);
+	if (moved)
+	{
+		map[nx][ny] = map[x][y];
+		map[x][y] = EMPTY;
+	}
 }
 
 // grouping : num of bolcoks, pos of std block, group index
@@ -273,6 +295,10 @@ void grouping(int x, int y, int color, Group* group_info, int map[20][20], bool 
 	{
 		group_info->num_of_blocks++;
 		group_map[x][y] = group_info->id;
+		if (map[x][y] == RAINBOW)
+		{
+			group_info->num_of_rainbows++;
+		}
 		if (map[x][y] == color)
 		{
 			if (y < group_info->std_y)
@@ -311,18 +337,31 @@ void grouping(int x, int y, int color, Group* group_info, int map[20][20], bool 
 	{
 		group_map[x][y] = 0;
 	}
+	if (group_info->num_of_blocks  == group_info->num_of_rainbows)
+	{
+		group_map[x][y] = 0;
+		group_info->num_of_blocks = 0;
+	}
 
 }
 
-void print_map(int map[20][20])
+void print_map(int map[20][20], const char* msg)
 {
+#if DEBUG
+	cout << msg << endl;
 	for (int y = 0; y < N; y++)
 	{
 		for (int x = 0; x < N; x++)
 		{
-			cout << map[x][y] << " ";
+			if (map[x][y] == EMPTY)
+				cout << ". ";
+			else if (map[x][y] == BLACK)
+				cout << "b ";
+			else
+				cout << map[x][y] << " ";
 		}
 		cout << endl;
 	}
 	cout << endl;
+#endif
 }

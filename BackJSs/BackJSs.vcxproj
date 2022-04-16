@@ -234,7 +234,9 @@
     <ClCompile Include="27_TheNewGame.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="38_SharkMiddleSchool.cpp" />
+    <ClCompile Include="38_SharkMiddleSchool.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="28_.Stencil.cpp">
