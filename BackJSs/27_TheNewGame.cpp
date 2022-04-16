@@ -25,7 +25,7 @@ struct Horse
 
 int reverse_dir(int dir);
 vector<Horse>::iterator move(int nx, int ny, int cur_x, int cur_y, vector<Horse>::iterator itr);
-void move_blue(int nx, int ny, int cur_x, int cur_y, vector<Horse>::iterator first_horse_itr);
+bool move_blue(int nx, int ny, int cur_x, int cur_y, vector<Horse>::iterator first_horse_itr);
 void print_vec();
 
 int dx[] = { 1,-1,0,0 };
@@ -85,13 +85,13 @@ int main()
 			int cur_y = first_horse_itr->y;
 			int nx = cur_x + dx[first_horse_itr->dir];
 			int ny = cur_y + dy[first_horse_itr->dir];
-
+			bool flag = false;
 			if (nx < 0 || nx >= N || ny < 0 || ny >= N)
 			{
 				first_horse_itr->dir = reverse_dir(first_horse_itr->dir);
 				nx = cur_x + dx[first_horse_itr->dir];
 				ny = cur_y + dy[first_horse_itr->dir];
-				move_blue(nx, ny, cur_x, cur_y, first_horse_itr);
+				flag = move_blue(nx, ny, cur_x, cur_y, first_horse_itr);
 			}
 			else if (g_map[nx][ny] == WHITE)
 			{
@@ -114,13 +114,25 @@ int main()
 				first_horse_itr->dir = reverse_dir(first_horse_itr->dir);
 				nx = cur_x + dx[first_horse_itr->dir];
 				ny = cur_y + dy[first_horse_itr->dir];
-				move_blue(nx, ny, cur_x, cur_y, first_horse_itr);
+				flag = move_blue(nx, ny, cur_x, cur_y, first_horse_itr);
 			}
-			if (horse_map[nx][ny].size() >= 4)
+			if (flag == true)
 			{
-				keep_going = false;
-				//print_vec();
-				break;
+				if (horse_map[nx][ny].size() >= 4)
+				{
+					keep_going = false;
+					//print_vec();
+					break;
+				}
+			}
+			else
+			{
+				if (horse_map[cur_x][cur_y].size() >= 4)
+				{
+					keep_going = false;
+					//print_vec();
+					break;
+				}
 			}
 		}
 	}
@@ -140,17 +152,17 @@ vector<Horse>::iterator move(int nx, int ny,int cur_x ,int cur_y, vector<Horse>:
 
 	// itr ªË¡¶
 	itr = horse_map[cur_x][cur_y].erase(itr);
-	print_vec();
 	return itr;
 }
 
-void move_blue(int nx, int ny, int cur_x, int cur_y, vector<Horse>::iterator first_horse_itr)
+bool move_blue(int nx, int ny, int cur_x, int cur_y, vector<Horse>::iterator first_horse_itr)
 {
-
+	bool flag = false;;
 	if (!(nx < 0 || nx >= N || ny < 0 || ny >= N))
 	{
 		if (g_map[nx][ny] == WHITE)
 		{
+			flag = true;
 			for (vector<Horse>::iterator itr = first_horse_itr; itr != horse_map[cur_x][cur_y].end(); )
 			{
 				itr = move(nx, ny, cur_x, cur_y, itr);
@@ -158,6 +170,7 @@ void move_blue(int nx, int ny, int cur_x, int cur_y, vector<Horse>::iterator fir
 		}
 		else if (g_map[nx][ny] == RED)
 		{
+			flag = true;
 			for (vector<Horse>::iterator itr = horse_map[cur_x][cur_y].end() - 1; itr != first_horse_itr; )
 			{
 				itr = move(nx, ny, cur_x, cur_y, itr);
@@ -166,6 +179,7 @@ void move_blue(int nx, int ny, int cur_x, int cur_y, vector<Horse>::iterator fir
 			move(nx, ny, cur_x, cur_y, first_horse_itr);
 		}
 	}
+	return flag;
 }
 
 int reverse_dir(int dir)
