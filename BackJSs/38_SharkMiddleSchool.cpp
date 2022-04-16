@@ -71,7 +71,6 @@ int main()
 	bool playing = true;
 	while (playing)
 	{
-		int group_map[20][20] = { 0 };
 
 		vector<Group> group_vec;
 		int ngid = 1;
@@ -84,8 +83,9 @@ int main()
 		{
 			for (int nx = 0; nx < N; nx++)
 			{
-				if (group_map[nx][ny] == 0)
+				if (map[nx][ny] > 0)
 				{
+					int group_map[20][20] = { 0 };
 					Group group_info;
 					group_info.id = ngid;
 					bool visited[20][20] = { 0 };
