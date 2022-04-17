@@ -129,7 +129,10 @@
     <ClCompile Include="38_SharkMiddleSchool.cpp">
       <Filter>소스 파일\2022</Filter>
     </ClCompile>
-    <ClCompile Include="39_SharkMiddleSchool_re2.cpp">
+    <ClCompile Include="19_PopulationMovement.cpp">
+      <Filter>소스 파일\2022</Filter>
+    </ClCompile>
+    <ClCompile Include="20_TreeInvestment.cpp">
       <Filter>소스 파일\2022</Filter>
     </ClCompile>
   </ItemGroup>
